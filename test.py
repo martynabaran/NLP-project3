@@ -91,3 +91,46 @@ def process_nouns(cont_sent_tag):
 # Przykładowy tekst do przetworzenia
 cont_sent = 'Harry Potter is coming to Hogwarts. Bees are buzzing around the honeycomb.'
 text_transition(cont_sent)
+
+
+def perform_set_operations(verbs_collected, operations):
+    results = None
+    
+    for operation in operations:
+        verb, op, *other_verbs = operation
+        
+        # Pobieramy słowa następujące po danym czasowniku
+        verb_set = set(verbs_collected.get(verb, []))
+        
+        for other_verb in other_verbs:
+            other_verb_set = set(verbs_collected.get(other_verb, []))
+            
+            if op == 'sum':
+                verb_set = verb_set.union(other_verb_set)
+            elif op == 'intersection':
+                verb_set = verb_set.intersection(other_verb_set)
+            elif op == 'difference':
+                verb_set = verb_set.difference(other_verb_set)
+        
+        if results is None:
+            results = verb_set
+        else:
+            results = results.union(verb_set)  # Zbieramy wyniki operacji
+
+    return results
+# aby przetestowac trzeba sobie dodac zdania ktore maja te czasowniki
+# Przykładowe operacje:
+# - "eat sum (drink)" - suma słów następujących po 'eat' i 'drink'
+# - "buy intersection (eat)" - przecięcie słów następujących po 'buy' i 'eat'
+# - "eat difference (run)" - różnica między słowami po 'eat' i 'run'
+operations = [
+    ('eat', 'sum', 'drink'),            # suma słów po 'eat' i 'drink'
+    ('buy', 'intersection', 'eat'),     # przecięcie słów po 'buy' i 'eat'
+    ('eat', 'difference', 'run')        # różnica między słowami po 'eat' i 'run'
+]
+
+# Wykonaj operacje
+result_set = perform_set_operations(verbs, operations)
+
+# Wyświetl wynik
+print(f"Wynik operacji na zbiorach: {result_set}")
