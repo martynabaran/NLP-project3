@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import font, scrolledtext
 
 from setOperationsHandler import SetOperationsHandler
 from textAsADict.textToDictionary import TextToDictionary
@@ -72,43 +72,50 @@ class VerbApp:
                                   bg=self.main_color)
         submit_button.pack(pady=20)
 
-        self.result_descr_label = tk.Label(self.root, text="The result of your operation :", font=smaller_font,
-                                     bg=self.main_color, )
+        self.result_descr_label = tk.Label(self.root, text="The result of your operation:", font=smaller_font,
+                                           bg=self.main_color)
         self.result_descr_label.pack()
-        # Create a label to display the result
-        self.result_label = tk.Label(self.root, text="", font=smaller_font, bg=self.main_color)
-        self.result_label.pack(pady=10)
 
+        # Create a scrolled text widget to display the result
+        self.result_text = scrolledtext.ScrolledText(self.root, font=smaller_font, bg=self.main_color, wrap=tk.WORD,
+                                                     height=10, width=80)
+        self.result_text.pack(pady=10)
 
-
+        # Initialize selected operation as None
+        self.selected_operation = None
 
     def submit_verb(self):
         # Get the verb from the entry fields
         verb1 = self.verb_entry1.get().strip()
-        verbs2 = set([v.strip() for v in self.verb_entry2.get().split(",")])
-        # For now, just print them to the console
-        print(f"Submitted verbs: {verb1}, {verbs2}")
+        verbs2 = set([v.strip() for v in self.verb_entry2.get().split(",") if v.strip()])
 
-        if self.selected_operation and verb1 and verbs2:
-
-            result = self.set_operatorHandler.perform_set_operations(verb1, verbs2,self.selected_operation, self.verb_dict)
-            self.show_result(result)
+        # Check if an operation is selected, and if inputs are provided
+        if not self.selected_operation:
+            self.show_result("Please select an operation.")
+        elif not verb1:
+            self.show_result("Please enter the first verb.")
+        elif not verbs2:
+            self.show_result("Please enter at least one verb in the second input.")
         else:
-            self.result_label.config(text="Please fill out all fields and select an operation.")
+            # Perform the operation
+            result = self.set_operatorHandler.perform_set_operations(verb1, verbs2, self.selected_operation, self.verb_dict)
+            # Show the result in the result text widget
+            self.show_result(result)
 
     def submit_operation(self, operation, button):
-        # Placeholder for the operation submission logic
+        # Set the selected operation
         self.selected_operation = operation
-        print(f"Operation submitted : {operation}")
+        # Update button colors to indicate the active operation
         for op_button in self.operation_buttons.values():
             op_button.config(bg=self.main_color)
         button.config(bg=self.active_color)
-
+        # Automatically update the result based on the new selected operation
+        self.submit_verb()
 
     def show_result(self, result):
-        # Show the result below the title
-        self.result_label.config(text=result)
-        self.result_label.pack(pady=20)
+        # Clear previous results and insert the new result
+        self.result_text.delete(1.0, tk.END)
+        self.result_text.insert(tk.END, result)
 
 
 # Create the main window
