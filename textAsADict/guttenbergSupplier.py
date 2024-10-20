@@ -12,4 +12,4 @@ class GutenbergSupplier:
     def get_text(self):
         sentences = gutenberg.sents()
         sentences_joined = [' '.join(sentence) for sentence in sentences]
-        return ' '.join(sentences_joined)
+        return ' '.join(sentences_joined)[:1000000]
